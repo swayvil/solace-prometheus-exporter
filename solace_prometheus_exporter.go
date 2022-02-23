@@ -162,6 +162,7 @@ var metricDesc = map[string]Metrics{
 		"system_spool_disk_partition_usage_active_percent": prometheus.NewDesc(namespace+"_"+"system_spool_disk_partition_usage_active_percent", "Total disk usage in percent.", nil, nil),
 		"system_spool_usage_bytes":                         prometheus.NewDesc(namespace+"_"+"system_spool_usage_bytes", "Spool total persisted usage.", nil, nil),
 		"system_spool_usage_msgs":                          prometheus.NewDesc(namespace+"_"+"system_spool_usage_msgs", "Spool total number of persisted messages.", nil, nil),
+		"system_spool_operational":                         prometheus.NewDesc(namespace+"_"+"system_spool_operational", "Spool global status", variableLabelsUp, nil), // Swayvil
 	},
 	"Redundancy": {
 		"system_redundancy_up":           prometheus.NewDesc(namespace+"_"+"system_redundancy_up", "Is redundancy up? (0=Down, 1=Up).", variableLabelsRedundancy, nil),
@@ -808,6 +809,13 @@ func (e *Exporter) getSpoolSemp1(ch chan<- prometheus.Metric) (ok float64, err e
 						PersistUsage             float64 `xml:"current-persist-usage"`
 						PersistMsgCount          float64 `xml:"total-messages-currently-spooled"`
 						ActiveDiskPartitionUsage string  `xml:"active-disk-partition-usage"` // May be "-"
+
+						// Swayvil, Get message-spool status
+						ConfigStatus          string `xml:"config-status"`
+						OperationalStatus     string `xml:"operational-status"`
+						DatapathUp            bool   `xml:"datapath-up"`
+						SynchronizationStatus string `xml:"synchronization-status"`
+						SpoolSyncStatus       string `xml:"spool-sync-status"`
 					} `xml:"message-spool-info"`
 				} `xml:"message-spool"`
 			} `xml:"show"`
@@ -850,6 +858,31 @@ func (e *Exporter) getSpoolSemp1(ch chan<- prometheus.Metric) (ok float64, err e
 
 	ch <- prometheus.MustNewConstMetric(metricDesc["Spool"]["system_spool_usage_bytes"], prometheus.GaugeValue, math.Round(target.RPC.Show.Spool.Info.PersistUsage*1048576.0))
 	ch <- prometheus.MustNewConstMetric(metricDesc["Spool"]["system_spool_usage_msgs"], prometheus.GaugeValue, target.RPC.Show.Spool.Info.PersistMsgCount)
+
+	// Swayvil, add additional fields
+	var systemSpoolOperational float64 = 1
+	var systemSpoolOperationalErr string = ""
+	if target.RPC.Show.Spool.Info.ConfigStatus != "Enabled (Primary)" && target.RPC.Show.Spool.Info.ConfigStatus != "Enabled (Backup)" {
+		systemSpoolOperational = 0
+		systemSpoolOperationalErr = "Config status: " + target.RPC.Show.Spool.Info.ConfigStatus + " - "
+	}
+	if target.RPC.Show.Spool.Info.OperationalStatus != "AD-Active" && target.RPC.Show.Spool.Info.OperationalStatus != "AD-Standby" {
+		systemSpoolOperational = 0
+		systemSpoolOperationalErr += "Operational status: " + target.RPC.Show.Spool.Info.OperationalStatus + " - "
+	}
+	if !target.RPC.Show.Spool.Info.DatapathUp {
+		systemSpoolOperational = 0
+		systemSpoolOperationalErr += "Data path Down" + " - "
+	}
+	if target.RPC.Show.Spool.Info.SynchronizationStatus != "Synced" {
+		systemSpoolOperational = 0
+		systemSpoolOperationalErr += "Synchronization status: " + target.RPC.Show.Spool.Info.SynchronizationStatus + " - "
+	}
+	if target.RPC.Show.Spool.Info.SpoolSyncStatus != "Synced" {
+		systemSpoolOperational = 0
+		systemSpoolOperationalErr += "Spool sync status: " + target.RPC.Show.Spool.Info.SpoolSyncStatus
+	}
+	ch <- prometheus.MustNewConstMetric(metricDesc["Spool"]["system_spool_operational"], prometheus.GaugeValue, systemSpoolOperational, systemSpoolOperationalErr)
 
 	return 1, nil
 }
