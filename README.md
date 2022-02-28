@@ -300,6 +300,18 @@ For more information try these resources:
 - The Solace Developer Portal website at: https://solace.dev
 - Ask the [Solace Community](https://solace.community)
 
+## Helm
+Build docker image:
+```
+go build
+docker build -t solacecommunity/solace-prometheus-exporter:1.4.3-solace_psg .
+```
+
+Install Helm chart:
+```
+helm install prometheus-solace-exporter ./prometheus-solace-exporter --set service.type=NodePort
+```
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.MD) for details on our code of conduct, and the process for submitting pull requests to us.
