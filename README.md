@@ -306,10 +306,12 @@ Build docker image:
 go build
 docker build -t solacecommunity/solace-prometheus-exporter:1.4.3-solace_psg .
 ```
-
+<br/>
+Update values.yaml, in particular "solace" section.
+<br/>
 Install Helm chart:
 ```
-helm install prometheus-solace-exporter ./prometheus-solace-exporter --set service.type=NodePort
+helm install prometheus-solace-exporter ./helm/prometheus-solace-exporter --set service.type=NodePort
 ```
 
 ## Contributing
