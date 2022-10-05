@@ -72,7 +72,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
   "id": null,
-  "iteration": 1664958345406,
+  "iteration": 1664958345409,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -2622,7 +2622,6 @@
       "id": 42,
       "interval": "60",
       "links": [],
-      "maxDataPoints": 500,
       "options": {
         "legend": {
           "calcs": [],
@@ -2716,7 +2715,6 @@
       "id": 67,
       "interval": "60",
       "links": [],
-      "maxDataPoints": 500,
       "options": {
         "legend": {
           "calcs": [],
@@ -3264,6 +3262,6 @@
   "timezone": "",
   "title": "Solace PubSub+ Cloud",
   "uid": "HUkhHbPWx",
-  "version": 31,
+  "version": 32,
   "weekStart": ""
 }
