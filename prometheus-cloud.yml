@@ -14,48 +14,9 @@ rule_files:
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
 
-  - job_name: 'solace-broker-std'
+  - job_name: 'solace-vpn-std'
     scrape_interval: 15s
-    metrics_path: /solace-broker-std
-    static_configs:
-      - targets: ['preprod']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: prometheus-solace-exporter:9628
-
-  - job_name: 'solace-broker-std-appliance'
-    scrape_interval: 15s
-    metrics_path: /solace-broker-std-appliance
-    static_configs:
-      - targets: ['preprod']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: prometheus-solace-exporter:9628
-
-  - job_name: 'solace-std'
-    scrape_interval: 15s
-    metrics_path: /solace-std
-    static_configs:
-      - targets: ['preprod']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: prometheus-solace-exporter:9628
-
-  - job_name: 'solace-std-appliance'
-    scrape_interval: 15s
-    metrics_path: /solace-std-appliance
+    metrics_path: /solace-vpn-std
     static_configs:
       - targets: ['preprod']
     relabel_configs:
@@ -69,19 +30,6 @@ scrape_configs:
   - job_name: 'solace-vpn-stats'
     scrape_interval: 15s
     metrics_path: /solace-vpn-stats
-    static_configs:
-      - targets: ['preprod']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: prometheus-solace-exporter:9628
-
-  - job_name: 'solace-det'
-    scrape_interval: 15s
-    metrics_path: /solace-det
     static_configs:
       - targets: ['preprod']
     relabel_configs:
